@@ -246,6 +246,12 @@ func main() {
 	start := time.Now()
 	angle := float32(0)
 
+	go func() {
+		for err := range watcher.Errors {
+			log.Println("watcher error:", err)
+		}
+	}()
+
 	for !window.ShouldClose() {
 		select {
 		case evt := <-watcher.Events:
@@ -256,8 +262,6 @@ func main() {
 					log.Println(err)
 				}
 			}
-		case err := <-watcher.Errors:
-			log.Println("watcher error:", err)
 		case <-ticker.C:
 			err := updateProgram(prog)
 			if err != nil {
