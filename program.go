@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"bitbucket.org/alotabits/gx"
+	"bitbucket.org/alotabits/shaderdev/internal/gx"
 	"github.com/go-gl/gl/all-core/gl"
 )
 
