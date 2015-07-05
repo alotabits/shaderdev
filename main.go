@@ -276,22 +276,27 @@ func main() {
 
 			updateModel(modelObj, prog.positionLoc, prog.colorLoc)
 
-			windowWidth, windowHeight := window.GetSize()
-			wdivh := float32(windowWidth) / float32(windowHeight)
-			hdivw := float32(windowHeight) / float32(windowWidth)
+			winWidth, winHeight := window.GetSize()
+			fbWidth, fbHeight := window.GetFramebufferSize()
+			wdivh := float32(fbWidth) / float32(fbHeight)
+			hdivw := float32(fbHeight) / float32(fbWidth)
 
 			gl.UseProgram(prog.id)
 			gl.ClearColor(0, 0, 0, 0)
 			gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-			gl.Viewport(0, 0, int32(windowWidth), int32(windowHeight))
+			gl.Viewport(0, 0, int32(fbWidth), int32(fbHeight))
 
 			if prog.viewportLoc >= 0 {
-				gl.Uniform4f(prog.viewportLoc, 0, 0, float32(windowWidth), float32(windowHeight))
+				gl.Uniform4f(prog.viewportLoc, 0, 0, float32(fbWidth), float32(fbHeight))
 			}
 
 			if prog.cursorLoc >= 0 {
-				x, y := window.GetCursorPos()
-				gl.Uniform4f(prog.cursorLoc, float32(x), float32(float64(windowHeight)-y), 0, 0)
+				// Use ratio of window cursor pos to screen dimensions to calc framebuffer cursor pos.
+				// Also, convert y coord to lower-left origin
+				winX, winY := window.GetCursorPos()
+				fbX := math.Floor((winX/float64(winWidth))*float64(fbWidth))
+				fbY := math.Floor((float64(winHeight)-winY)/float64(winHeight)*float64(fbHeight))
+				gl.Uniform4f(prog.cursorLoc, float32(fbX), float32(fbY), 0, 0)
 			}
 
 			if prog.timeLoc >= 0 {
