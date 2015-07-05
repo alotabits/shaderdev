@@ -11,8 +11,8 @@ import (
 	"time"
 	"unsafe"
 
-	"bitbucket.org/alotabits/shaderdev/internal/gx"
-	"bitbucket.org/alotabits/shaderdev/internal/obj"
+	"github.com/alotabits/shaderdev/internal/gx"
+	"github.com/alotabits/shaderdev/internal/obj"
 	"github.com/go-gl/gl/all-core/gl"
 	"github.com/go-gl/glfw/v3.1/glfw"
 	"github.com/go-gl/mathgl/mgl32"
