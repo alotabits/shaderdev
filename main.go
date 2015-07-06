@@ -263,12 +263,19 @@ func main() {
 				}
 			}
 		case <-ticker.C:
+			winWidth, winHeight := window.GetSize()
+			fbWidth, fbHeight := window.GetFramebufferSize()
+			wdivh := float32(fbWidth) / float32(fbHeight)
+			hdivw := float32(fbHeight) / float32(fbWidth)
+			gl.UseProgram(0)
+
+			// Clear to error color
+			gl.ClearColor(1, 0, 0, 0)
+			gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
 			err := updateProgram(prog)
 			if err != nil {
 				log.Println(err)
-				gl.UseProgram(0)
-				gl.ClearColor(1, 0, 1, 1)
-				gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 				window.SwapBuffers()
 				glfw.PollEvents()
 				continue
@@ -276,15 +283,15 @@ func main() {
 
 			updateModel(modelObj, prog.positionLoc, prog.colorLoc)
 
-			winWidth, winHeight := window.GetSize()
-			fbWidth, fbHeight := window.GetFramebufferSize()
-			wdivh := float32(fbWidth) / float32(fbHeight)
-			hdivw := float32(fbHeight) / float32(fbWidth)
-
-			gl.UseProgram(prog.id)
+			// Use scissor test for clearing to catch errors with viewport setup, hopefully.
 			gl.ClearColor(0, 0, 0, 0)
+			gl.Enable(gl.SCISSOR_TEST)
+			gl.Scissor(0, 0, int32(fbWidth), int32(fbHeight))
 			gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+			gl.Disable(gl.SCISSOR_TEST)
+
 			gl.Viewport(0, 0, int32(fbWidth), int32(fbHeight))
+			gl.UseProgram(prog.id)
 
 			if prog.viewportLoc >= 0 {
 				gl.Uniform4f(prog.viewportLoc, 0, 0, float32(fbWidth), float32(fbHeight))
